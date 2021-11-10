@@ -4,6 +4,7 @@ import Filter from "../filter/filter";
 import TodoList from "../todo-list/todo-list";
 
 const App = () => {
+    console.log("Устал сильно от своей тупости(((((")
     const todos = [
         {id:1, label:'Working as donkey', important:true, done:true},
         {id:2, label: 'Living at working place', important: true, done: false},
