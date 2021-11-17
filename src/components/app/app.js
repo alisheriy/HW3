@@ -1,11 +1,12 @@
 import React from 'react';
-
 import AppHeader from '../app-header';
 import SearchPanel from '../search-panel';
 import TodoList from '../todo-list';
 import ItemStatusFilter from '../item-status-filter';
+import TodoAdd from "../todo-add";
 
 import './app.css';
+
 
 class App extends React.Component {
   state = {
@@ -21,7 +22,7 @@ class App extends React.Component {
 
   onDelete = (id) => {
     this.setState((oldState) => {
-      const elementIndex = oldState.todoData.findIndex((item) => item.id == id);
+      const elementIndex = oldState.todoData.findIndex((item) => item.id === id);
 
       const prev = oldState.todoData.slice(0, elementIndex)
       const next = oldState.todoData.slice(elementIndex + 1)
@@ -32,9 +33,9 @@ class App extends React.Component {
     })
   }
 
-  onImportant = (id) => {
+   onImportant = (id) => {
     this.setState((oldState) => {
-      const elementIndex = oldState.todoData.findIndex((item) => item.id == id);
+      const elementIndex = oldState.todoData.findIndex((item) => item.id === id);
       const oldElement = oldState.todoData[elementIndex]
 
       const prev = oldState.todoData.slice(0, elementIndex)
@@ -49,7 +50,7 @@ class App extends React.Component {
 
   onDone = (id) => {
     this.setState((oldState) => {
-      const elementIndex = oldState.todoData.findIndex((item) => item.id == id);
+      const elementIndex = oldState.todoData.findIndex((item) => item.id === id);
       const oldElement = oldState.todoData[elementIndex]
 
       const prev = oldState.todoData.slice(0, elementIndex)
@@ -65,25 +66,18 @@ class App extends React.Component {
   onStatusFilter = (todos, filter) => {
     let data = todos;
 
-    if (filter == 'done') {
+    if (filter === 'done') {
       data = todos.filter((item) => {
-        if (item.done == true) {
+        if (item.done === true) {
           return item
         }
       })
-    } else{
-      let newData = data;
-      // (filter == 'done')
-      return(
-        newData = todos.filter((item) => {
-          if (item.done == false) {
-            return item
-          } else if(filter == 'all'){
-            return todos
-          }
-        })
-
-      )
+    } else if (filter === 'active'){
+      data = todos.filter((item) => {
+        if (item.done === false){
+          return item
+        }
+      })
     }
 
     return data;
@@ -92,6 +86,23 @@ class App extends React.Component {
   onChangeStatus = (status) => {
     this.setState({
       status: status
+    })
+  }
+
+  onAdd = (text) => {
+    const newTodo = {
+      id: Math.floor(Math.random() *55),
+      label: text,
+      important: false,
+      done: false
+    }
+
+    this.setState((oldState) => {
+      return(
+          {
+            todoData: [...oldState.todoData, newTodo]
+          }
+      )
     })
   }
 
@@ -108,19 +119,38 @@ class App extends React.Component {
       search: searchString
     })
   }
+  onAppHeader = (id) =>{
+    this.setState(({todoData}) =>{
+      return{
+        todoData: this.props(todoData, id, 'done')
+      };
 
+
+    });
+  };
+  todoData;
   render() {
+    const filterdTodos = this.state.todoData.filter((item)=>{
+      return item.done===true
+    })
+    const todosDone = filterdTodos.length
+    const haveToDo = this.state.todoData.filter((item) => {
+      return item.done === false
+    })
+    const toDo = haveToDo.length
     console.log(this.state)
-    const filered = this.onStatusFilter(this.state.todoData, this.state.status);
-    const searchFiltred = this.onSearchFilter(filered, this.state.search);
-
+    const filtred = this.onStatusFilter(this.state.todoData, this.state.status);
+    const searchFiltred = this.onSearchFilter(filtred, this.state.search);
+    // const haveToDo = this.todoData.filter(el => el.done).length;
+    // const isDone = this.todoData.length - haveToDo;
     return (
       <div className="todo-app">
-        <AppHeader toDo={1} done={3} />
+        <AppHeader toDo={toDo} done={todosDone} />
         <div className="top-panel d-flex">
           <SearchPanel onSearch={this.onSearch} />
           <ItemStatusFilter onChangeStatus={this.onChangeStatus} />
         </div>
+        <TodoAdd onAdd={this.onAdd}/>
 
         <TodoList
           todos={searchFiltred}
@@ -129,10 +159,9 @@ class App extends React.Component {
           onDone={this.onDone}
         />
         <h1>Угадайте у кого недосып???((((</h1>
-
       </div>
     );
   }
-};
+}
 
 export default App;
